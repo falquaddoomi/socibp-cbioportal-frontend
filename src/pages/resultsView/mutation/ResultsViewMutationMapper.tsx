@@ -72,12 +72,15 @@ export default class ResultsViewMutationMapper extends MutationMapper<IResultsVi
                 oncoKbData={this.props.store.oncoKbData}
                 civicGenes={this.props.store.civicGenes}
                 civicVariants={this.props.store.civicVariants}
+                svipGenes={this.props.store.svipGenes}
+                svipVariants={this.props.store.svipVariants}
                 userEmailAddress={this.props.config.userEmailAddress}
                 enableOncoKb={this.props.config.showOncoKB}
                 enableFunctionalImpact={this.props.config.showGenomeNexus}
                 enableHotspot={this.props.config.showHotspot}
                 enableMyCancerGenome={this.props.config.showMyCancerGenome}
                 enableCivic={this.props.config.showCivic}
+                enableSVIP={this.props.config.showSVIP}
             />
         );
     }

@@ -19,6 +19,7 @@ import MutationMapperStore from "./MutationMapperStore";
 export interface IMutationMapperConfig {
     userEmailAddress?:string;
     showCivic?: boolean;
+    showSVIP?: boolean;
     showHotspot?: boolean;
     showMyCancerGenome?: boolean;
     showOncoKB?: boolean;

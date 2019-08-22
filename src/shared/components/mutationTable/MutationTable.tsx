@@ -43,6 +43,7 @@ import {IPaginationControlsProps} from "../paginationControls/PaginationControls
 import {IColumnVisibilityControlsProps} from "../columnVisibilityControls/ColumnVisibilityControls";
 import MobxPromise from "mobxpromise";
 import { VariantAnnotation } from "shared/api/generated/GenomeNexusAPI";
+import {ISVIPGeneDataWrapper, ISVIPVariantDataWrapper} from "shared/model/SVIP";
 
 export interface IMutationTableProps {
     studyIdToStudy?: {[studyId:string]:CancerStudy};
@@ -59,6 +60,7 @@ export interface IMutationTableProps {
     enableMyCancerGenome?: boolean;
     enableHotspot?: boolean;
     enableCivic?: boolean;
+    enableSVIP?: boolean;
     enableFunctionalImpact?: boolean;
     myCancerGenomeData?: IMyCancerGenomeData;
     hotspotData?: IHotspotDataWrapper;
@@ -68,6 +70,8 @@ export interface IMutationTableProps {
     oncoKbAnnotatedGenes:{[entrezGeneId:number]:boolean};
     civicGenes?: ICivicGeneDataWrapper;
     civicVariants?: ICivicVariantDataWrapper;
+    svipGenes?: ISVIPGeneDataWrapper;
+    svipVariants?: ISVIPVariantDataWrapper;
     mrnaExprRankMolecularProfileId?:string;
     discreteCNAMolecularProfileId?:string;
     columns?:MutationTableColumnType[];
@@ -166,6 +170,7 @@ export default class MutationTable<P extends IMutationTableProps> extends React.
         enableMyCancerGenome: true,
         enableHotspot: true,
         enableCivic: false,
+        enableSVIP: false
     };
 
     constructor(props:P)
@@ -446,7 +451,10 @@ export default class MutationTable<P extends IMutationTableProps> extends React.
                 pubMedCache: this.props.pubMedCache,
                 civicGenes: this.props.civicGenes,
                 civicVariants: this.props.civicVariants,
+                svipGenes: this.props.svipGenes,
+                svipVariants: this.props.svipVariants,
                 enableCivic: this.props.enableCivic as boolean,
+                enableSVIP: this.props.enableSVIP as boolean,
                 enableOncoKb: this.props.enableOncoKb as boolean,
                 enableMyCancerGenome: this.props.enableMyCancerGenome as boolean,
                 enableHotspot: this.props.enableHotspot as boolean,

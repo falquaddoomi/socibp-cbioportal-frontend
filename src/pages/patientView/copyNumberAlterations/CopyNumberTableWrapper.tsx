@@ -35,6 +35,7 @@ type ICopyNumberTableWrapperProps = {
     oncoKbAnnotatedGenes:{[entrezGeneId:number]:boolean}|Error;
     enableOncoKb?:boolean;
     enableCivic?:boolean;
+    enableSVIP?:boolean;
     pubMedCache?:PubMedCache;
     data:DiscreteCopyNumberData[][];
     copyNumberCountCache?:CopyNumberCountCache;
@@ -53,7 +54,8 @@ export default class CopyNumberTableWrapper extends React.Component<ICopyNumberT
 
     public static defaultProps = {
         enableOncoKb: true,
-        enableCivic: false
+        enableCivic: false,
+        enableSVIP: false
     };
 
     render() {
@@ -105,6 +107,7 @@ export default class CopyNumberTableWrapper extends React.Component<ICopyNumberT
                 civicGenes: this.props.cnaCivicGenes,
                 civicVariants: this.props.cnaCivicVariants,
                 enableCivic: this.props.enableCivic as boolean,
+                enableSVIP: this.props.enableSVIP as boolean,
                 enableMyCancerGenome: false,
                 enableHotspot: false,
                 userEmailAddress: this.props.userEmailAddress

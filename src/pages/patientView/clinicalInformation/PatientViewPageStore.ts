@@ -37,6 +37,7 @@ import {
     fetchMutSigData, findMrnaRankMolecularProfileId, mergeDiscreteCNAData, fetchSamplesForPatient, fetchClinicalData,
     fetchCopyNumberSegments, fetchClinicalDataForPatient, makeStudyToCancerTypeMap,
     fetchCivicGenes, fetchCnaCivicGenes, fetchCivicVariants, groupBySampleId, findSamplesWithoutCancerTypeClinicalData,
+    fetchSVIPGenes, fetchSVIPVariants,
     fetchStudiesForSamplesWithoutCancerTypeClinicalData, fetchOncoKbAnnotatedGenesSuppressErrors, concatMutationData
 } from "shared/lib/StoreUtils";
 import {indexHotspotsData, fetchHotspotsData} from "shared/lib/CancerHotspotsUtils";
@@ -45,6 +46,7 @@ import {Gene as OncoKbGene} from "../../../shared/api/generated/OncoKbAPI";
 import {MutationTableDownloadDataFetcher} from "shared/lib/MutationTableDownloadDataFetcher";
 import { VariantAnnotation } from 'shared/api/generated/GenomeNexusAPI';
 import { fetchVariantAnnotationsIndexedByGenomicLocation } from 'shared/lib/MutationAnnotator';
+import {ISVIPGene, ISVIPVariantSet} from "shared/model/SVIP";
 
 type PageMode = 'patient' | 'sample';
 
@@ -244,7 +246,7 @@ export class PatientViewPageStore {
                             return getPathologyReport(patientId, i+1);
                         }, () => reports);
                 }
-                
+
                return getPathologyReport(this.patientId, 0);
             } else {
                 return [];
@@ -552,6 +554,39 @@ export class PatientViewPageStore {
         invoke: async() => {
             if (AppConfig.showCivic && this.civicGenes.result) {
                 return fetchCivicVariants(this.civicGenes.result as ICivicGene,
+                    this.mutationData,
+                    this.uncalledMutationData);
+            }
+            else {
+                return {};
+            }
+        },
+        onError: (err: Error) => {
+            // fail silently
+        }
+    }, undefined);
+
+    readonly svipGenes = remoteData<ISVIPGene | undefined>({
+        await: () => [
+            this.mutationData,
+            this.uncalledMutationData,
+            this.clinicalDataForSamples
+        ],
+        invoke: async() => AppConfig.showSVIP ? fetchSVIPGenes(this.mutationData, this.uncalledMutationData) : {},
+        onError: (err: Error) => {
+            // fail silently
+        }
+    }, undefined);
+
+    readonly svipVariants = remoteData<ISVIPVariantSet | undefined>({
+        await: () => [
+            this.svipGenes,
+            this.mutationData,
+            this.uncalledMutationData
+        ],
+        invoke: async() => {
+            if (AppConfig.showSVIP && this.svipGenes.result) {
+                return fetchSVIPVariants(this.svipGenes.result as ISVIPGene,
                     this.mutationData,
                     this.uncalledMutationData);
             }

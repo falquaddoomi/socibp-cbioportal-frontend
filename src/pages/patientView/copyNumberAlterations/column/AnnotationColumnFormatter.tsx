@@ -62,6 +62,7 @@ export default class AnnotationColumnFormatter
                         AnnotationColumnFormatter.getCivicStatus(civicGenes.status, civicVariants.status) : "pending",
                 hasCivicVariants: civicGenes && civicGenes.result && civicVariants && civicVariants.result ?
                     AnnotationColumnFormatter.hasCivicVariants(copyNumberData, civicGenes.result, civicVariants.result) : true,
+                svipEntry: null, svipStatus: "error", hasSVIPVariants: false,
                 myCancerGenomeLinks: [],
                 hotspotStatus: "complete",
                 isHotspot: false,
@@ -79,7 +80,7 @@ export default class AnnotationColumnFormatter
     * Returns an ICivicEntry if the civicGenes and civicVariants have information about the gene and the mutation (variant) specified. Otherwise it returns
     * an empty object.
     */
-    public static getCivicEntry(copyNumberData:DiscreteCopyNumberData[], civicGenes:ICivicGene, 
+    public static getCivicEntry(copyNumberData:DiscreteCopyNumberData[], civicGenes:ICivicGene,
                                 civicVariants:ICivicVariant): ICivicEntry | null
     {
         let civicEntry = null;
@@ -93,7 +94,7 @@ export default class AnnotationColumnFormatter
 
         return civicEntry;
     }
-    
+
     public static getCivicStatus(civicGenesStatus:"pending" | "error" | "complete", civicVariantsStatus:"pending" | "error" | "complete"): "pending" | "error" | "complete"
     {
     if (civicGenesStatus === "error" || civicVariantsStatus === "error") {
@@ -102,7 +103,7 @@ export default class AnnotationColumnFormatter
     if (civicGenesStatus === "complete" && civicVariantsStatus === "complete") {
         return "complete";
     }
-    
+
     return "pending";
     }
 

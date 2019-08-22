@@ -1,0 +1,67 @@
+.svip-card {
+  margin: auto;
+  //width: 600px;
+  font-size: 14px;
+  line-height: 18px;
+  padding: 0;
+}
+
+.svip-card * {
+  border-collapse: collapse;
+  box-sizing: border-box;
+}
+
+.svip-card ul {
+  padding: 0;
+}
+
+.svip-card .footer {
+  width: 100%;
+  border-top: solid 1px #eee;
+  padding: 12px 8px 8px;
+}
+
+.svip-card .footer .svip-logo {
+  vertical-align: top;
+}
+
+.svip-card .tip-header {
+  line-height: 22px;
+  font-size: 22px;
+  background-color: #273646;
+  color: #fff;
+  text-align: center;
+  padding: 5px 10px;
+}
+
+.svip-card-content {
+  max-height: 400px;
+  padding: 20px;
+  overflow: auto;
+}
+
+.svip-card-variant-header {
+  margin-bottom: 1px;
+  padding: 3px 6px 3px;
+  background: #ece3f2;
+}
+
+.svip-card-variant-description {
+  padding: 3px 6px 3px;
+  background: #ece3f2;
+}
+
+.svip-card-gene-name a,
+.svip-card-variant-name a {
+  font-weight: bold;
+  color: #1974b8;
+}
+
+.svip-card .disease-table {
+  margin-top: 1em;
+
+  th {
+    border-bottom: solid 2px black;
+  }
+  th, td { padding: 5px; }
+}

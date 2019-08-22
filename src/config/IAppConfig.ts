@@ -11,6 +11,7 @@ export interface IAppConfig {
     //    'Priority Studies': ['blca_tcga_pub', 'coadread_tcga_pub', 'brca_tcga_pub2015'], // for demo
     //},
     showCivic?: boolean;
+    showSVIP?: boolean;
     showHotspot?: boolean;
     showMyCancerGenome?: boolean;
     showOncoKB?: boolean;

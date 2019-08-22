@@ -39,6 +39,8 @@ import {MOLECULAR_PROFILE_MUTATIONS_SUFFIX, MOLECULAR_PROFILE_UNCALLED_MUTATIONS
 import GenomeNexusAPI from "shared/api/generated/GenomeNexusAPI";
 import {AlterationTypeConstants} from "../../pages/resultsView/ResultsViewPageStore";
 import {stringListToIndexSet} from "./StringUtils";
+import {ISVIPGene, ISVIPVariantSet} from "shared/model/SVIP";
+import {getSVIPGenes, getSVIPVariants} from "shared/lib/SVIPUtils";
 
 export const ONCOKB_DEFAULT: IOncoKbData = {
     uniqueSampleKeyToTumorType : {},
@@ -645,7 +647,7 @@ export async function fetchCivicGenes(mutationData?:MobxPromise<Mutation[]>,
     mutationDataResult.forEach(function(mutation: Mutation) {
         queryHugoSymbols.add(mutation.gene.hugoGeneSymbol);
     });
-    
+
     let querySymbols: Array<string> = Array.from(queryHugoSymbols);
 
     let civicGenes: ICivicGene = await getCivicGenes(querySymbols);
@@ -657,15 +659,15 @@ export async function fetchCnaCivicGenes(discreteCNAData:MobxPromise<DiscreteCop
 {
     if (discreteCNAData.result && discreteCNAData.result.length > 0) {
         let queryHugoSymbols: Set<string> = new Set([]);
-        
+
         discreteCNAData.result.forEach(function(cna: DiscreteCopyNumberData) {
             queryHugoSymbols.add(cna.gene.hugoGeneSymbol);
         });
-        
+
         let querySymbols: Array<string> = Array.from(queryHugoSymbols);
-    
+
         let civicGenes: ICivicGene = (await getCivicGenes(querySymbols));
-    
+
         return civicGenes;
     } else {
         return {};
@@ -687,6 +689,40 @@ export async function fetchCivicVariants(civicGenes: ICivicGene,
     }
 
     return civicVariants;
+}
+
+export async function fetchSVIPGenes(mutationData?:MobxPromise<Mutation[]>,
+                                     uncalledMutationData?:MobxPromise<Mutation[]>)
+{
+    const mutationDataResult = concatMutationData(mutationData, uncalledMutationData);
+
+    if (mutationDataResult.length === 0) {
+        return {};
+    }
+
+    const queryHugoSymbols: Set<string> = new Set([]);
+
+    mutationDataResult.forEach(function(mutation: Mutation) {
+        queryHugoSymbols.add(mutation.gene.hugoGeneSymbol);
+    });
+
+    const querySymbols: string[] = Array.from(queryHugoSymbols);
+
+    const svipGenes: ISVIPGene = await getSVIPGenes(querySymbols);
+
+    return svipGenes;
+}
+
+export async function fetchSVIPVariants(svipGenes: ISVIPGene,
+                                        mutationData?:MobxPromise<Mutation[]>,
+                                        uncalledMutationData?:MobxPromise<Mutation[]>)
+{
+    let svipVariants: ISVIPVariantSet = {};
+    const mutationDataResult = concatMutationData(mutationData, uncalledMutationData);
+
+    svipVariants = await getSVIPVariants(svipGenes, mutationDataResult.length > 0 ? mutationDataResult : undefined);
+
+    return svipVariants;
 }
 
 export async function fetchDiscreteCNAData(discreteCopyNumberFilter:DiscreteCopyNumberFilter,

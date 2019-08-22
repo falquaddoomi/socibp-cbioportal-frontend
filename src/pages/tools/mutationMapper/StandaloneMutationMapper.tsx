@@ -33,6 +33,7 @@ export default class StandaloneMutationMapper extends MutationMapper<IMutationMa
                 enableHotspot={this.props.config.showHotspot}
                 enableMyCancerGenome={this.props.config.showMyCancerGenome}
                 enableCivic={false}
+                enableSVIP={false}
             />
         );
     }

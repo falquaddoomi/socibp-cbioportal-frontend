@@ -7,13 +7,14 @@ import {IOncoKbDataWrapper} from "shared/model/OncoKB";
 import {IHotspotIndex} from "shared/model/CancerHotspots";
 import {ICivicGene, ICivicVariant} from "shared/model/Civic";
 import {
-    fetchCosmicData, fetchCivicGenes, fetchCivicVariants
+    fetchCosmicData, fetchCivicGenes, fetchCivicVariants, fetchSVIPGenes, fetchSVIPVariants
 } from "shared/lib/StoreUtils";
 import {IMutationMapperConfig} from "shared/components/mutationMapper/MutationMapper";
 import MutationCountCache from "shared/cache/MutationCountCache";
 import {MutationTableDownloadDataFetcher} from "shared/lib/MutationTableDownloadDataFetcher";
 import MutationMapperStore from "shared/components/mutationMapper/MutationMapperStore";
 import { VariantAnnotation } from "shared/api/generated/GenomeNexusAPI";
+import {ISVIPGene, ISVIPVariantSet} from "shared/model/SVIP";
 
 export default class ResultsViewMutationMapperStore extends MutationMapperStore
 {
@@ -80,6 +81,35 @@ export default class ResultsViewMutationMapperStore extends MutationMapperStore
         invoke: async() => {
             if (this.config.showCivic && this.civicGenes.result) {
                 return fetchCivicVariants(this.civicGenes.result as ICivicGene, this.mutationData);
+            }
+            else {
+                return {};
+            }
+        },
+        onError: (err: Error) => {
+            // fail silently
+        }
+    }, undefined);
+
+    readonly svipGenes = remoteData<ISVIPGene | undefined>({
+        await: () => [
+            this.mutationData,
+            this.clinicalDataForSamples
+        ],
+        invoke: async() => this.config.showSVIP ? fetchSVIPGenes(this.mutationData) : {},
+        onError: (err: Error) => {
+            // fail silently
+        }
+    }, undefined);
+
+    readonly svipVariants = remoteData<ISVIPVariantSet | undefined>({
+        await: () => [
+            this.svipGenes,
+            this.mutationData
+        ],
+        invoke: async() => {
+            if (this.config.showSVIP && this.svipGenes.result) {
+                return fetchSVIPVariants(this.svipGenes.result as ISVIPGene, this.mutationData);
             }
             else {
                 return {};

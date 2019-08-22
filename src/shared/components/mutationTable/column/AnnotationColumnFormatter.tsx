@@ -16,12 +16,22 @@ import {generateQueryVariantId, generateQueryVariant} from "shared/lib/OncoKbUti
 import {is3dHotspot, isRecurrentHotspot} from "shared/lib/AnnotationUtils";
 import {ICivicVariant, ICivicGene, ICivicEntry, ICivicVariantData, ICivicGeneData, ICivicGeneDataWrapper, ICivicVariantDataWrapper} from "shared/model/Civic.ts";
 import {buildCivicEntry} from "shared/lib/CivicUtils";
+import {
+    ISVIPEntry,
+    ISVIPGene,
+    ISVIPGeneData,
+    ISVIPGeneDataWrapper,
+    ISVIPVariantSet, ISVIPVariantData,
+    ISVIPVariantDataWrapper
+} from "shared/model/SVIP";
+import SVIP from "shared/components/annotation/SVIP";
 
 export interface IAnnotationColumnProps {
     enableOncoKb: boolean;
     enableMyCancerGenome: boolean;
     enableHotspot: boolean;
     enableCivic: boolean;
+    enableSVIP: boolean;
     hotspotData?: IHotspotDataWrapper;
     myCancerGenomeData?: IMyCancerGenomeData;
     oncoKbData?: IOncoKbDataWrapper;
@@ -31,6 +41,8 @@ export interface IAnnotationColumnProps {
     userEmailAddress?:string;
     civicGenes?: ICivicGeneDataWrapper;
     civicVariants?: ICivicVariantDataWrapper;
+    svipGenes?: ISVIPGeneDataWrapper;
+    svipVariants?: ISVIPVariantDataWrapper;
 }
 
 export interface IAnnotation {
@@ -44,6 +56,9 @@ export interface IAnnotation {
     civicEntry?: ICivicEntry | null;
     civicStatus: "pending" | "error" | "complete";
     hasCivicVariants: boolean;
+    svipEntry?: ISVIPEntry | null;
+    svipStatus: "pending" | "error" | "complete";
+    hasSVIPVariants: boolean;
     hugoGeneSymbol:string;
 }
 
@@ -62,8 +77,10 @@ export default class AnnotationColumnFormatter
             is3dHotspot: false,
             hotspotStatus: "complete",
             hasCivicVariants: true,
+            hasSVIPVariants: true,
             hugoGeneSymbol: '',
-            civicStatus: "complete"
+            civicStatus: "complete",
+            svipStatus: "complete"
         };
     }
 
@@ -73,7 +90,9 @@ export default class AnnotationColumnFormatter
                           myCancerGenomeData?:IMyCancerGenomeData,
                           oncoKbData?:IOncoKbDataWrapper,
                           civicGenes?:ICivicGeneDataWrapper,
-                          civicVariants?:ICivicVariantDataWrapper)
+                          civicVariants?:ICivicVariantDataWrapper,
+                          svipGenes?:ISVIPGeneDataWrapper,
+                          svipVariants?:ISVIPVariantDataWrapper)
     {
         let value: Partial<IAnnotation>;
 
@@ -93,6 +112,11 @@ export default class AnnotationColumnFormatter
                 civicStatus: civicGenes && civicGenes.status && civicVariants && civicVariants.status ?
                         AnnotationColumnFormatter.getCivicStatus(civicGenes.status, civicVariants.status) : "pending",
                 hasCivicVariants: true,
+                svipEntry: svipGenes && svipGenes.result && svipVariants && svipVariants.result ?
+                    AnnotationColumnFormatter.getSVIPEntry(mutation, svipGenes.result, svipVariants.result) : undefined,
+                svipStatus: svipGenes && svipGenes.status && svipVariants && svipVariants.status ?
+                    AnnotationColumnFormatter.getSVIPStatus(svipGenes.status, svipVariants.status) : "pending",
+                hasSVIPVariants: true,
                 myCancerGenomeLinks: myCancerGenomeData ?
                     AnnotationColumnFormatter.getMyCancerGenomeLinks(mutation, myCancerGenomeData) : [],
                 isHotspot: hotspotData && hotspotData.result && hotspotData.status === "complete" ?
@@ -157,7 +181,7 @@ export default class AnnotationColumnFormatter
 
         return civicEntry;
     }
-    
+
     public static getCivicStatus(civicGenesStatus:"pending" | "error" | "complete",
                                  civicVariantsStatus:"pending" | "error" | "complete"): "pending" | "error" | "complete"
     {
@@ -165,6 +189,42 @@ export default class AnnotationColumnFormatter
             return "error";
         }
         if (civicGenesStatus === "complete" && civicVariantsStatus === "complete") {
+            return "complete";
+        }
+
+        return "pending";
+    }
+
+    /**
+     * Returns an ISVIPEntry if the svipGenes and svipVariants have information about the gene and the mutation (variant) specified. Otherwise it returns null.
+     */
+    public static getSVIPEntry(mutation:Mutation, svipGenes:ISVIPGene, svipVariants:ISVIPVariantSet): ISVIPEntry | null
+    {
+        const geneSymbol: string = mutation.gene.hugoGeneSymbol;
+
+        //Only search for matching Civic variants if the gene mutation exists in the Civic API
+        if (svipVariants[geneSymbol] && svipVariants[geneSymbol][mutation.proteinChange]) {
+            const geneVariants: {[name: string]: ISVIPVariantData} = {[mutation.proteinChange]: svipVariants[geneSymbol][mutation.proteinChange]};
+            const geneEntry: ISVIPGeneData = svipGenes[geneSymbol];
+            return {
+                name: geneEntry.name,
+                description: 'n/a',
+                url: geneEntry.url,
+                variants: geneVariants
+            };
+        }
+        else {
+            return null;
+        }
+    }
+
+    public static getSVIPStatus(svipGenesStatus:"pending" | "error" | "complete",
+                                svipVariantsStatus:"pending" | "error" | "complete"): "pending" | "error" | "complete"
+    {
+        if (svipGenesStatus === "error" || svipVariantsStatus === "error") {
+            return "error";
+        }
+        if (svipGenesStatus === "complete" && svipVariantsStatus === "complete") {
             return "complete";
         }
 
@@ -244,6 +304,7 @@ export default class AnnotationColumnFormatter
         return _.flatten([
             OncoKB.sortValue(annotationData.oncoKbIndicator),
             Civic.sortValue(annotationData.civicEntry),
+            SVIP.sortValue(annotationData.svipEntry),
             MyCancerGenome.sortValue(annotationData.myCancerGenomeLinks),
             CancerHotspots.sortValue(annotationData.isHotspot, annotationData.is3dHotspot)
         ]);
@@ -278,7 +339,9 @@ export default class AnnotationColumnFormatter
             columnProps.myCancerGenomeData,
             columnProps.oncoKbData,
             columnProps.civicGenes,
-            columnProps.civicVariants);
+            columnProps.civicVariants,
+            columnProps.svipGenes,
+            columnProps.svipVariants);
 
         let evidenceQuery:Query|undefined;
 
@@ -321,6 +384,13 @@ export default class AnnotationColumnFormatter
                         civicEntry={annotation.civicEntry}
                         civicStatus={annotation.civicStatus}
                         hasCivicVariants={annotation.hasCivicVariants}
+                    />
+                </If>
+                <If condition={columnProps.enableSVIP || false}>
+                    <SVIP
+                        svipEntry={annotation.svipEntry}
+                        svipStatus={annotation.svipStatus}
+                        hasSVIPVariants={annotation.hasSVIPVariants}
                     />
                 </If>
                 <If condition={columnProps.enableMyCancerGenome || false}>
