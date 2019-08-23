@@ -92,7 +92,7 @@ export default class SVIPCard extends React.Component<ISVIPCardProps, {}> {
 
                 <div className="item footer">
                     <a href={this.props.geneUrl} target="_blank">
-                        <img src={require("./images/SVIP_Logo_text.png")} className="svip-logo" alt="SVIP"/>
+                        <img src={require("./images/SVIP_Logo_Text.png")} className="svip-logo" alt="SVIP"/>
                     </a>
                 </div>
             </div>
