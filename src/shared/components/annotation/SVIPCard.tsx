@@ -44,7 +44,7 @@ export default class SVIPCard extends React.Component<ISVIPCardProps, {}> {
                     <div className="col s12 svip-card-content">
                         <div className="col s12 svip-card-gene">
                             <span className="svip-card-gene-name">
-                                <b>Gene:</b> <a href={this.props.geneUrl} target="_blank">{this.props.geneName}</a>
+                                <b>Gene:</b> <a href={this.props.geneUrl} target="_blank">{this.props.geneName} <i className="fa fa-external-link"></i></a>
                             </span>
                         </div>
 
@@ -52,7 +52,7 @@ export default class SVIPCard extends React.Component<ISVIPCardProps, {}> {
                             {_.values(this.props.variants).map(x => (
                                 <div className="variant_entry">
                                     <div className="svip-card-variant-name">
-                                        <b>Variant:</b> <a href={x.url} target="_blank">{x.name}</a>
+                                        <b>Variant:</b> <a href={x.url} target="_blank">{x.name} <i className="fa fa-external-link"></i></a>
                                     </div>
 
                                     <table className="disease-table">

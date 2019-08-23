@@ -1,6 +1,6 @@
 .svip-card {
   margin: auto;
-  //width: 600px;
+  width: 600px;
   font-size: 14px;
   line-height: 18px;
   padding: 0;
@@ -17,7 +17,7 @@
 
 .svip-card .footer {
   width: 100%;
-  border-top: solid 1px #eee;
+  border-top: solid 1px #ddd;
   padding: 12px 8px 8px;
 }
 
@@ -36,7 +36,7 @@
 
 .svip-card-content {
   max-height: 400px;
-  padding: 20px;
+  padding: 10px 5px 0 5px;
   overflow: auto;
 }
 
@@ -62,6 +62,9 @@
 
   th {
     border-bottom: solid 2px black;
+    white-space: nowrap;
   }
   th, td { padding: 5px; }
+
+  tr:nth-child(even) td { background-color: #eee; }
 }
